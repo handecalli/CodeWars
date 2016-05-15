@@ -1,0 +1,57 @@
+package edu.sabanciuniv.testsapp.ui;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import edu.sabanciuniv.testsapp.business.UserService;
+import edu.sabanciuniv.testsapp.domain.User;
+
+/**
+ * Servlet implementation class StatisticsServlet
+ */
+@WebServlet("/StatisticsServlet")
+public class StatisticsServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public StatisticsServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		String player = request.getParameter("player");
+		
+		UserService us = new UserService();
+		User user = us.GetUser(player);
+		
+		int point = user.getPoints();
+		int rating = user.getRating();
+		
+		request.setAttribute("player", player);
+		request.setAttribute("point", point);
+		request.setAttribute("rating", rating);
+		
+		request.getRequestDispatcher("ShowStatistics.jsp").forward(request, response);
+		
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
