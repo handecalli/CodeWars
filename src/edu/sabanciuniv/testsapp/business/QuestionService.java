@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 
 import edu.sabanciuniv.testsapp.domain.Question;
 
-@Path("QuestionService")
+//@Path("QuestionService")
 public class QuestionService {
 	
 	@GET

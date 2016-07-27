@@ -9,16 +9,25 @@ public class Game {
 	private String player1;
 	private String player2;
 	private String type;
+	private String winner;
 	
 	private List<Question> questionList = null;
 	private List<String> player1Answers = null;
 	private List<String> player2Answers = null;
+	private List<Integer> player1Times = null;
+	private List<Integer> player2Times = null;
+	private List<Integer> player1Correctness = null; 
+	private List<Integer> player2Correctness = null;
 	
 	private	int questionIndex;
 	private int state;
-	private int player1Score;
-	private int player2Score;
+	private int player1TotalScore;
+	private int player2TotalScore;
 	
+	public Game() {
+		super();
+	}
+
 	public Game(int gameID,String player1, String player2, String type, int state)
 	{
 		this.setGameID(gameID);
@@ -27,8 +36,8 @@ public class Game {
 		this.setType(type);
 		this.setState(state);
 		this.setQuestionIndex(0);
-		this.setPlayer1Score(0);
-		this.setPlayer2Score(0);	
+		this.setPlayer1TotalScore(0);
+		this.setPlayer2TotalScore(0);	
 	}
 
 	public int getGameID() {
@@ -87,22 +96,6 @@ public class Game {
 		this.questionIndex = questionIndex;
 	}
 
-	public int getPlayer1Score() {
-		return player1Score;
-	}
-
-	public void setPlayer1Score(int player1Score) {
-		this.player1Score = player1Score;
-	}
-
-	public int getPlayer2Score() {
-		return player2Score;
-	}
-
-	public void setPlayer2Score(int player2Score) {
-		this.player2Score = player2Score;
-	}
-
 	public List<String> getPlayer1Answers() {
 		return player1Answers;
 	}
@@ -117,6 +110,62 @@ public class Game {
 
 	public void setPlayer2Answers(List<String> player2Answers) {
 		this.player2Answers = player2Answers;
+	}
+
+	public List<Integer> getPlayer1Times() {
+		return player1Times;
+	}
+
+	public void setPlayer1Times(List<Integer> player1Times) {
+		this.player1Times = player1Times;
+	}
+
+	public List<Integer> getPlayer2Times() {
+		return player2Times;
+	}
+
+	public void setPlayer2Times(List<Integer> player2Times) {
+		this.player2Times = player2Times;
+	}
+
+	public List<Integer> getPlayer1Correctness() {
+		return player1Correctness;
+	}
+
+	public void setPlayer1Correctness(List<Integer> player1Correctness) {
+		this.player1Correctness = player1Correctness;
+	}
+
+	public List<Integer> getPlayer2Correctness() {
+		return player2Correctness;
+	}
+
+	public void setPlayer2Correctness(List<Integer> player2Correctness) {
+		this.player2Correctness = player2Correctness;
+	}
+
+	public int getPlayer1TotalScore() {
+		return player1TotalScore;
+	}
+
+	public void setPlayer1TotalScore(int player1TotalScore) {
+		this.player1TotalScore = player1TotalScore;
+	}
+
+	public int getPlayer2TotalScore() {
+		return player2TotalScore;
+	}
+
+	public void setPlayer2TotalScore(int player2TotalScore) {
+		this.player2TotalScore = player2TotalScore;
+	}
+	
+	public String getWinner() {
+		return winner;
+	}
+
+	public void setWinner(String winner) {
+		this.winner = winner;
 	}
 
 }

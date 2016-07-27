@@ -43,22 +43,18 @@ public class GameService {
 			
 			//state = 0  player1 is waiting for an opponent
 			//state = 1  game in progress
-			//state = 2  game finished
+			//state = 2  waiting for all players to finish
+			//state = 3  game is finished for good
 			
 			ps_GetWaitingGames = con.prepareStatement("SELECT gameID, p1name FROM game WHERE type = ? AND p2name IS NULL");
 			ps_GetWaitingGames.setString(1, type);	
 			rs_GetWaitingGames = ps_GetWaitingGames.executeQuery();
-			
-			// DEBUG ***********
-			System.out.println("Type: " + type);
+		
 			
 			if(rs_GetWaitingGames.next())	 // JOIN GAME (state = 1)
 			{
 				int gameID = rs_GetWaitingGames.getInt("gameID");				
 				String player1 = rs_GetWaitingGames.getString("p1name");
-				
-				// DEBUG ***********
-				System.out.println("gameID: " + gameID);		
 				
 				ps_SetGameState = con.prepareStatement("UPDATE game SET p2name = ?, state = ? WHERE gameID = ?");
 				ps_SetGameState.setString(1, player2);	
@@ -71,7 +67,7 @@ public class GameService {
 				game = new Game(gameID, player1, player2, type, 1);
 				GetQuestionIDs(game);
 				
-				System.out.println("Game " + gameID + " is started between " + player1 + " and " + player2);			
+				System.out.println("Game with ID " + gameID + " is started between " + player1 + " and " + player2);			
 			}
 			
 			else	// CREATE GAME (state = 0)
@@ -92,9 +88,6 @@ public class GameService {
 					
 				    game = new Game(gameID, player2, null, type, 0);
 					SetQuestionIDs(type, game);
-					
-					// DEBUG ***********
-					System.out.println("Game " + gameID + " is created by " + player2);
 				}										
 			}			
 		} catch (SQLException e) {
@@ -178,7 +171,7 @@ public class GameService {
 	}
 	
 	@GET
-	@Path("AcceptFriendGame/{gameID}/{friend}/{type}")
+	@Path("FriendGameResponse/{gameID}/{friend}/{type}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Game FriendGameResponse(int gameID, boolean answer)
 	{
@@ -249,6 +242,8 @@ public class GameService {
 		return null;
 	}
 	
+	@GET
+	@Path("GetQuestionIDs/{game}")
 	private void GetQuestionIDs(Game game)
 	{
 		Connection con = null;
@@ -290,6 +285,8 @@ public class GameService {
 		}	
 	}
 	
+	@GET
+	@Path("SetQuestionIDs/{type}/{game}")
 	private void SetQuestionIDs(String type, Game game)
 	{
 		QuestionService questionService = new QuestionService();
@@ -369,6 +366,253 @@ public class GameService {
 			}
 		}
 	}
+	
+	public int SubmitResults(Game game, String username) throws SQLException
+	{
+		Connection con = null;
+		PreparedStatement ps = null;
+		PreparedStatement ps_UpdateGame = null;
+		con = ConnectionService.createConnection();
+		
+		List<String> playerAnswers = null;
+		List<Integer> playerTimes = null;
+		List<Integer> playerCorrectness = null;
+		
+		 
+		int stateToSet = 2;
+		if(GetGameState(game.getGameID()) == 2)
+			stateToSet = 3;
+		
+		if(game.getPlayer1().equals(username))
+		{
+			playerAnswers = game.getPlayer1Answers();
+			playerTimes = game.getPlayer1Times();
+			playerCorrectness = game.getPlayer1Correctness();
+			
+			ps_UpdateGame = con.prepareStatement("UPDATE game SET p1score = ?, state = ? WHERE gameID = ?");
+			ps_UpdateGame.setInt(1, game.getPlayer1TotalScore());
+			ps_UpdateGame.setInt(2, stateToSet);
+			ps_UpdateGame.setInt(3, game.getGameID());
+			ps_UpdateGame.executeUpdate();
+		}
+		else
+		{
+			playerAnswers = game.getPlayer2Answers();
+			playerTimes = game.getPlayer2Times();
+			playerCorrectness = game.getPlayer2Correctness();
+			
+			ps_UpdateGame = con.prepareStatement("UPDATE game SET p2score = ?, state = ? WHERE gameID = ?");
+			ps_UpdateGame.setInt(1, game.getPlayer2TotalScore());
+			ps_UpdateGame.setInt(2, stateToSet);
+			ps_UpdateGame.setInt(3, game.getGameID());
+			ps_UpdateGame.executeUpdate();
+		}
+		
+		try {
+			ps = con.prepareStatement("INSERT INTO player_answers VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+			ps.setInt(1, game.getGameID());
+			ps.setString(2, username);
+			ps.setString(3, playerAnswers.get(0));
+			ps.setString(4, playerAnswers.get(1));
+			ps.setString(5, playerAnswers.get(2));
+			ps.setString(6, playerAnswers.get(3));
+			ps.setString(7, playerAnswers.get(4));
+			ps.setString(8, playerAnswers.get(5));
+			ps.setString(9, playerAnswers.get(6));
+			ps.setInt(10, playerTimes.get(0));
+			ps.setInt(11, playerTimes.get(1));
+			ps.setInt(12, playerTimes.get(2));
+			ps.setInt(13, playerTimes.get(3));
+			ps.setInt(14, playerTimes.get(4));
+			ps.setInt(15, playerTimes.get(5));
+			ps.setInt(16, playerTimes.get(6));
+			ps.setInt(17, playerCorrectness.get(0));
+			ps.setInt(18, playerCorrectness.get(1));
+			ps.setInt(19, playerCorrectness.get(2));
+			ps.setInt(20, playerCorrectness.get(3));
+			ps.setInt(21, playerCorrectness.get(4));
+			ps.setInt(22, playerCorrectness.get(5));
+			ps.setInt(23, playerCorrectness.get(6));
+			ps.executeUpdate();
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (ps != null) {
+				ps.close();
+			}
+			if(ps_UpdateGame != null) {
+				ps_UpdateGame.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		
+		return stateToSet;
+	}
+	
+	public int GetGameState(int gameID) throws SQLException
+	{
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		con = ConnectionService.createConnection();
+		int state = 2;
+		
+		ps = con.prepareStatement("SELECT state FROM game WHERE gameID = ?"); 
+		ps.setInt(1, gameID);	
+		rs = ps.executeQuery();
+		
+		if(rs.next())
+		{
+			state = rs.getInt(1);
+		}
+		
+		if(con != null)
+			con.close();
+		
+		return state;
+	}
+	
+	public Game GetGame(Game game) throws SQLException
+	{
+		Connection con = null;
+		PreparedStatement ps_game = null;
+		PreparedStatement ps_update_game = null;
+		PreparedStatement ps_player_answers = null;
+		ResultSet rs_game = null;
+		ResultSet rs_player_answers = null;
+		con = ConnectionService.createConnection();
+		
+		String p1name = "", p2name = "", winner = "";
+		int p1score = 0, p2score = 0, state = 3;
+		List<String> player1Answers = null;
+		List<Integer> player1Times = null;
+		List<Integer> player1Correctness = null;
+		List<String> player2Answers = null;
+		List<Integer> player2Times = null;
+		List<Integer> player2Correctness = null;
+		
+		ps_game = con.prepareStatement("SELECT * FROM game WHERE gameID = ?"); //gameID, type, p1name, p2name, p1score, p2score, winner, state
+		ps_game.setInt(1, game.getGameID());	
+		rs_game = ps_game.executeQuery();
+		
+		if(rs_game.next())
+		{
+			p1name = rs_game.getString(3);
+			p2name = rs_game.getString(4);
+			p1score = rs_game.getInt(5);
+			p2score = rs_game.getInt(6);
+			state = rs_game.getInt(8);
+			
+			winner = p1name;
+			if(p1score < p2score)
+				winner = p2name;
+			else if (p1score == p2score)
+				winner = "draw";	
+		}
+		
+		game.setWinner(winner);
+		game.setState(state);
+		game.setPlayer1TotalScore(p1score);
+		game.setPlayer2TotalScore(p2score);
+		
+		ps_update_game = con.prepareStatement("UPDATE game SET winner = ? WHERE gameID = ?");
+		ps_update_game.setString(1, winner);
+		ps_update_game.setInt(2, game.getGameID());
+		ps_update_game.executeUpdate();
+		
+		ps_player_answers = con.prepareStatement("SELECT * FROM player_answers WHERE gameID = ? AND (username = ? OR username = ?)"); 
+		//player_answers attributes -> gameID, username, answer[1,7], time [1,7], correctness[1,7]
+		ps_player_answers.setInt(1, game.getGameID());	
+		ps_player_answers.setString(2, p1name);
+		ps_player_answers.setString(3, p2name);
+		rs_player_answers = ps_player_answers.executeQuery();
+		
+		while(rs_player_answers.next())
+		{
+			String username = rs_player_answers.getString(2);
+			
+			if(username.equals(p1name))
+			{
+				player1Answers = new ArrayList<String>();
+				player1Answers.add(rs_player_answers.getString(3));
+			    player1Answers.add(rs_player_answers.getString(4));
+			    player1Answers.add(rs_player_answers.getString(5));
+			    player1Answers.add(rs_player_answers.getString(6));
+			    player1Answers.add(rs_player_answers.getString(7));
+			    player1Answers.add(rs_player_answers.getString(8));
+			    player1Answers.add(rs_player_answers.getString(9));
+			    
+			    player1Times = new ArrayList<Integer>();
+				player1Times.add(rs_player_answers.getInt(10));
+				player1Times.add(rs_player_answers.getInt(11));
+				player1Times.add(rs_player_answers.getInt(12));
+				player1Times.add(rs_player_answers.getInt(13));
+				player1Times.add(rs_player_answers.getInt(14));
+				player1Times.add(rs_player_answers.getInt(15));
+				player1Times.add(rs_player_answers.getInt(16));
+				
+				player1Correctness = new ArrayList<Integer>();
+				player1Correctness.add(rs_player_answers.getInt(17));
+				player1Correctness.add(rs_player_answers.getInt(18));
+				player1Correctness.add(rs_player_answers.getInt(19));
+				player1Correctness.add(rs_player_answers.getInt(20));
+				player1Correctness.add(rs_player_answers.getInt(21));
+				player1Correctness.add(rs_player_answers.getInt(22));
+				player1Correctness.add(rs_player_answers.getInt(23));
+				
+			}
+			else if (username.equals(p2name))
+			{
+				player2Answers = new ArrayList<String>();
+				player2Answers.add(rs_player_answers.getString(3));
+			    player2Answers.add(rs_player_answers.getString(4));
+			    player2Answers.add(rs_player_answers.getString(5));
+			    player2Answers.add(rs_player_answers.getString(6));
+			    player2Answers.add(rs_player_answers.getString(7));
+			    player2Answers.add(rs_player_answers.getString(8));
+			    player2Answers.add(rs_player_answers.getString(9));
+			    
+			    player2Times = new ArrayList<Integer>();
+				player2Times.add(rs_player_answers.getInt(10));
+				player2Times.add(rs_player_answers.getInt(11));
+				player2Times.add(rs_player_answers.getInt(12));
+				player2Times.add(rs_player_answers.getInt(13));
+				player2Times.add(rs_player_answers.getInt(14));
+				player2Times.add(rs_player_answers.getInt(15));
+				player2Times.add(rs_player_answers.getInt(16));
+				
+				player2Correctness = new ArrayList<Integer>();
+				player2Correctness.add(rs_player_answers.getInt(17));
+				player2Correctness.add(rs_player_answers.getInt(18));
+				player2Correctness.add(rs_player_answers.getInt(19));
+				player2Correctness.add(rs_player_answers.getInt(20));
+				player2Correctness.add(rs_player_answers.getInt(21));
+				player2Correctness.add(rs_player_answers.getInt(22));
+				player2Correctness.add(rs_player_answers.getInt(23));
+			}
+		}
+		
+		game.setPlayer1(p1name);
+		game.setPlayer1Answers(player1Answers);
+		game.setPlayer1Times(player1Times);
+		game.setPlayer1Correctness(player1Correctness);
+		
+		game.setPlayer2(p2name);
+		game.setPlayer2Answers(player2Answers);
+		game.setPlayer2Times(player2Times);
+		game.setPlayer2Correctness(player2Correctness);
+		
+		if(con != null)
+			con.close();
+		
+		return game;
+	}
+	
 	
 	
 	// waiting player repeatedly checks if another player has joined the game

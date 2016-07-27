@@ -1,6 +1,7 @@
 package edu.sabanciuniv.testsapp.ui;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.sabanciuniv.testsapp.business.GameService;
 import edu.sabanciuniv.testsapp.domain.Game;
 import edu.sabanciuniv.testsapp.domain.User;
 
@@ -31,73 +33,100 @@ public class AnswerServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {	
+		
 		Game game = (Game)request.getSession().getAttribute("game");
 		User user = (User)request.getSession().getAttribute("user");
 		
 		String userAnswer = request.getParameter("userAnswer");
 		String correctAnswer = request.getParameter("correctAnswer");
+		String timeLeftStr = request.getParameter("timeLeft");
+		
 		String currentUser = user.getUsername();
 		String player1 = game.getPlayer1();
+		int index = game.getQuestionIndex();	
+				
+		double timeLeftDbl = Double.parseDouble(timeLeftStr);	
+		int timeLeft = (int)timeLeftDbl + 1 ;
 		
-		int index = game.getQuestionIndex();			
-		if(userAnswer.equals(correctAnswer))
+		if(timeLeftDbl <= 0)
+			timeLeft = 0;
+		
+		if(currentUser.equals(player1))
 		{
-			if(currentUser.equals(player1))
+			List<Integer> correctList = game.getPlayer1Correctness();
+			List<String> answerList = game.getPlayer1Answers();
+			List<Integer> timeList = game.getPlayer1Times();
+			
+			if(correctList == null)
+				correctList = new ArrayList<Integer>();
+			if(answerList == null)
+				answerList = new ArrayList<String>();
+			if(timeList == null)
+				timeList = new ArrayList<Integer>();
+			
+			answerList.add(userAnswer);
+			timeList.add(timeLeft);
+			
+			if(userAnswer.equals(correctAnswer))
 			{
-				int currentScore = game.getPlayer1Score();
-				game.setPlayer1Score(currentScore+1);
-				List<String> answerList = game.getPlayer1Answers();
-				if(answerList == null)
-					answerList = new ArrayList<String>();
-					
-				answerList.add(userAnswer);
-				game.setPlayer1Answers(answerList);
+				correctList.add(1);		
+				int currentScore = game.getPlayer1TotalScore();
+				game.setPlayer1TotalScore(currentScore + timeLeft*4);
 			}
 			else
-			{
-				int currentScore = game.getPlayer2Score();
-				game.setPlayer2Score(currentScore+1);
-				List<String> answerList = game.getPlayer2Answers();
-				if(answerList == null)
-					answerList = new ArrayList<String>();
-					
-				answerList.add(userAnswer);
-				game.setPlayer2Answers(answerList);
-			}
-		}	
+				correctList.add(0);
+			
+			game.setPlayer1Correctness(correctList);
+			game.setPlayer1Times(timeList);
+			game.setPlayer1Answers(answerList);
+		}
 		else
 		{
-			if(currentUser.equals(player1))
+			List<Integer> correctList = game.getPlayer2Correctness();
+			List<String> answerList = game.getPlayer2Answers();
+			List<Integer> timeList = game.getPlayer2Times();
+			
+			if(correctList == null)
+				correctList = new ArrayList<Integer>();
+			if(answerList == null)
+				answerList = new ArrayList<String>();
+			if(timeList == null)
+				timeList = new ArrayList<Integer>();
+			
+			answerList.add(userAnswer);
+			timeList.add(timeLeft);
+			
+			if(userAnswer.equals(correctAnswer))
 			{
-				List<String> answerList = game.getPlayer1Answers();
-				if(answerList == null)
-					answerList = new ArrayList<String>();
-					
-				answerList.add(userAnswer);
-				game.setPlayer1Answers(answerList);
+				correctList.add(1);		
+				int currentScore = game.getPlayer2TotalScore();
+				game.setPlayer2TotalScore(currentScore + timeLeft*4);
 			}
 			else
-			{
-				List<String> answerList = game.getPlayer2Answers();
-				if(answerList == null)
-					answerList = new ArrayList<String>();
-					
-				answerList.add(userAnswer);
-				game.setPlayer2Answers(answerList);
-			}
+				correctList.add(0);
+			
+			game.setPlayer2Correctness(correctList);
+			game.setPlayer2Times(timeList);
+			game.setPlayer2Answers(answerList);
 		}
-		
+			
 		if(index < 6)
 		{
 			game.setQuestionIndex(index+1);
-			request.getRequestDispatcher("MultipleChoice.jsp").forward(request, response);
+			request.getSession().setAttribute("game", game);
+			//request.getRequestDispatcher("MultipleChoice.jsp").forward(request, response);
 		}
-		else
+		else if(index == 6)
 		{
-			request.getRequestDispatcher("ShowResults.jsp").forward(request, response);
+			GameService gs = new GameService();
+			try {
+				game.setState(gs.SubmitResults(game, user.getUsername()));
+				request.getSession().setAttribute("game", game);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+					
 		}
 	}
 

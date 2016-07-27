@@ -50,14 +50,14 @@ public class LoginServlet extends HttpServlet {
 			{		
 				request.getRequestDispatcher("UserMain.jsp").forward(request, response);
 			}
-			else
+			else // when user type is not player, the user has to be an admin
 			{
 				request.getRequestDispatcher("AdminMain.jsp").forward(request, response);
 			}
 		}
 		else
 		{
-			System.out.println("LoginFailed sayfasi mi yapsak?");
+			System.out.println("LoginFailed");
 			request.getRequestDispatcher("index.html").forward(request, response);
 		}
 	}

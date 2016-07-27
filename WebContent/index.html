@@ -1,50 +1,129 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Code Wars</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!-- Latest compiled and minified CSS -->
+
+  <link rel="stylesheet" type="text/css" href="css/login.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/flatly/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet">
+
+
+  <style type="text/css">
+
+  	html, body {
+        max-width: 100%;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+    
+    body{
+    	padding-top: 80px;
+    }
+
+	.navbar-nav {
+	  width: 100%;
+	  text-align: center;
+	}
+	.navbar-nav > li {
+	  float: none;
+	  display: inline-block;
+	}
+
+  </style>
+
 </head>
 <body>
-<h1>Code Wars</h1>
 
-<h2>Login</h2>
-<form action="LoginServlet" method="post">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-main">
+      <ul class="nav navbar-nav" >
+        <li><a style="font-size: 22px;" href="/UserMain.jsp">Code Wars</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-Username:
-<input type="text" name="uname"><br/>
-Password:
-<input type="password" name="pword"><br/>
-<input type="submit" value="Send">
 
-</form>
+<div class="pen-title"></div>
 
-<h2>Register</h2>
-<form onsubmit='return validate()' name='reg' action="RegisterServlet" method="post">
 
-Sabancı University Username:
-<input type="text" name="username"><br/>
-Password:
-<input type="password" name="password"><br/>
-<input type="submit" value="Create New Account">
-</form>
+<div class="container">
+  <div class="card"></div>
+  <div class="card">
+    <h1 class="title">Login</h1>
+    <form name="loginForm" onsubmit="return validateLogin()" action="LoginServlet" method="post">
+      <div class="input-container">
+        <input type="text" id="username" name="uname" required="required"/>
+        <label for="Username">SU Username</label>
+        <div class="bar"></div>
+      </div>
+      <div class="input-container">
+        <input type="password" id="password" name="pword" required="required"/>
+        <label for="Password">Password</label>
+        <div class="bar"></div>
+      </div>
+      <div class="button-container">
+        <button type="submit"><span>Go</span></button>
+      </div>
+      <div class="footer"><a href="#">Forgot your password?</a></div>
+    </form>
+  </div>
+  <div class="card alt">
+    <div class="toggle"></div>
+    <h1 class="title">Register
+      <div class="close"></div>
+    </h1>
+    <form name="registerForm" onsubmit="return validateRegister()" action="RegisterServlet" method="post">
+      <div class="input-container">
+        <input type="text" id="Username" name="username" required="required"/>
+        <label for="Username">SU Username</label>
+        <div class="bar"></div>
+      </div>
+      <div class="input-container">
+        <input type="password" id="Password" name="password" required="required"/>
+        <label for="Password">Password</label>
+        <div class="bar"></div>
+      </div>
+      <div class="input-container">
+        <input type="password" id="Repeat Password" name="repeatPass" required="required"/>
+        <label for="Repeat Password">Repeat Password</label>
+        <div class="bar" id="repeat_bar"></div>
+      </div>
+      <div class="button-container">
+        <button type="submit"><span>Next</span></button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script type="text/javascript">
-function validate() {
-    if (document.reg.username.value == "" && document.reg.password.value == "") {
-        alert("Username and password are required");
-        document.reg.username.focus();
-        return false;
-    }
-    if (document.reg.username.value == "") {
-        alert("Username is required");
-        document.reg.username.focus();
-        return false;
-    }
-    if (document.reg.password.value == "") {
-    alert("Password is required");
-    document.reg.password.focus();
+    $('.toggle').on('click', function() {
+    $('.container').stop().addClass('active');
+  });
+
+  $('.close').on('click', function() {
+    $('.container').stop().removeClass('active');
+  });
+
+  function validateRegister() {
+    var pass = document.forms["registerForm"]["pass"].value;
+    var repeatPass = document.forms["registerForm"]["repeatPass"].value;
+    if (pass != repeatPass) {
+        
+    	document.getElementById("repeat_bar").style.background = "#E74C3C";
+
+    	/*var repeat_bar = document.querySelector("#repeat_bar");
+    	repeat_bar.classList.add("redbar");*/
+
+
         return false;
     }
     return true;

@@ -18,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 
 import edu.sabanciuniv.testsapp.domain.User;
 
-@Path ("UserService")
+@Path ("/UserService")
 public class UserService {
 	
 	private static final int ITERATIONS = 10000;
@@ -26,7 +26,7 @@ public class UserService {
 	
 @GET
 @Path("register/{username}/{password}")
-public void register(@PathParam("username") String username, @PathParam("password") String password) {
+public int register(@PathParam("username") String username, @PathParam("password") String password) {
 		
 	char[] pass_char = password.toCharArray();
 	byte[] rand_salt = Create_Salt();
@@ -48,13 +48,14 @@ public void register(@PathParam("username") String username, @PathParam("passwor
 		
 	} catch (Exception ex) {
 		ex.printStackTrace();
+		return 0;
 	}
-	
+	return 1;
 }
 
 @GET
 @Path("login/{username}/{password}")
-@Produces(MediaType.APPLICATION_JSON)
+@Produces("application/json")
 public User login(@PathParam("username")String username, @PathParam("password") String password) {
 	try {
 		Connection con = ConnectionService.createConnection();
@@ -127,8 +128,7 @@ public User GetUser(@PathParam("username") String username) {
 			ResultSet friend_results = ps2.executeQuery();
 			
 			while(friend_results.next())
-			{
-				
+			{			
 				confirmed_status = friend_results.getInt("confirmed");
 				friend = friend_results.getString("username");
 				
@@ -136,20 +136,14 @@ public User GetUser(@PathParam("username") String username) {
 				{	
 					friendList.add(friend);
 				}
-				else if(confirmed_status == 0)
+				else
 				{
 					requestList.add(friend);
 				}
-				else
-				{	
-					System.out.println("Confirm can only be 0 or 1");
-				}
 			}
-			
-			System.out.println(username + " has rating: "+ rating + "and point: " + points);	
+				
 			con.close();
-			byte[] image = GetImage(imageID);
-			User user = new User(username, points, rating, usertype, requestList, friendList, image);
+			User user = new User(username, points, rating, usertype, requestList, friendList, imageID);
 			return user;
 		}
 		else
@@ -215,40 +209,8 @@ public String SearchUser(@PathParam("username") String username)
 	    return diff == 0;
 	}
 
-	private static byte[] GetImage(int imageID)
-	{
-		Blob img = null;
-	    byte[] imgData = null ;
-	    
-		Connection con = ConnectionService.createConnection();
-
-		try {
-		
-			PreparedStatement ps = con.prepareStatement("SELECT Image FROM images WHERE ImageID = (?) "); //AND active != 0
-			ps.setInt(1, imageID);	
-			ResultSet rs = ps.executeQuery();
-			
-			if(rs.next())
-			{
-				img = rs.getBlob("Image");
-				if(img != null)
-				{
-					
-					imgData = img.getBytes(1,(int)img.length());	
-				}
-				else
-				{
-					System.out.println("null dondu"); /////
-				}
-
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return imgData;
-	}
-
+	@GET
+	@Path("logout/{user}")
 	public void logout(User user) {
 		
 		Connection con = ConnectionService.createConnection();

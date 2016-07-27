@@ -21,6 +21,7 @@
 
   <!-- jQuery library -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 
   <!-- Latest compiled JavaScript -->
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -38,6 +39,8 @@
     body{
     	padding-top: 80px;
     	padding-bottom: 60px;
+    	
+    	height: 100vh;
     }
     
     /*** TOOLTIP ***/
@@ -257,13 +260,92 @@
    		outline: 1px solid red;
   	}	*/
 	
+	.avatar {
+    /*float: left;
+    margin-top: 1em;
+    margin-right: 1em;*/
+    margin-top: 15px;
+    margin-left: 5px;
+    position: relative;
+
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+
+    -webkit-box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0,0,0,.2);
+    box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0,0,0,.2);
+}
+
+#pad{
+	padding-left: 33px;
+}
+
+
+/* AVATAR */
+
+#avatar {
+    position: relative;
+    border-radius: 5px 5px 5px 5px;
+    /*content: url(img/1.jpg);*/
+    margin-top: 8px;
+    margin-left: 10px;
+    height: 220px;
+    width: 220px;
+    /*padding: 20px;   */
+
+    -webkit-box-shadow: 0 0 0 2px #fff, 0 0 0 0px transparent, 0 2px 5px 4px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 0 0 2px #fff, 0 0 0 0px transparent, 0 2px 5px 4px rgba(0,0,0,.2);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 0px transparent, 0 2px 5px 4px rgba(0,0,0,.2);
+}
+
+
+
+/* GRAPH */
+.legend {
+  margin-top: 200px;
+}
+
+.widget {
+  margin: 0 auto;
+  width: 350px;
+  background-color: #222D3A;
+  border-radius: 5px;
+  box-shadow: 0px 0px 1px 0px #06060d;
+}
+#header {
+  background-color: #29384D;
+  height: 40px;
+  color: #FFFFFF;
+  text-align: center;
+  line-height: 40px;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+  font-weight: 400;
+  font-size: 1.5em;
+  text-shadow: 1px 1px #06060d;
+}
+
+.chart-container {
+  padding: 25px;
+}
+
+.shadow {
+  -webkit-filter: drop-shadow( 0px 3px 3px rgba(0, 0, 0, .5));
+  filter: drop-shadow( 0px 3px 3px rgba(0, 0, 0, .5));
+}
+
+	
+	
   </style>
 </head>
 
 <body>
+
 <%
 	User user = (User)request.getSession().getAttribute("user");
 	String username = "";
+	String userImage = "";
 	List<String> friendReq = null;
 	List<String> friendList = null;
 	int points = 0;
@@ -278,8 +360,10 @@
 	//	out.print("Hello " + username + " welcome to code wars!");
 	//	out.print(" Points:" + points + " Rating: " + rating);	
 		
-		byte[] imgData = user.getImage();	
-	
+		int ID = user.getImageID();	
+		String imageID = String.valueOf(ID);
+		userImage =  "content: url(img/" + imageID + ".jpg;";
+		
 		//response.setContentType("image/gif");
 		//OutputStream o = response.getOutputStream();
 		//o.write(imgData);
@@ -318,10 +402,10 @@
               <ul class="dropdown-menu" aria-labelledby="themes">
                 <li><a href="../default/">All categories</a></li>
                 <li class="divider"></li>
-                <li><a href="../cerulean/">Classes</a></li>
-                <li><a href="../cerulean/">Output</a></li>
-                <li><a href="../cerulean/">Pointers</a></li>
-                <li><a href="../cerulean/">Matrix</a></li>
+                <li><a href="javascript:;">Classes</a></li>
+                <li><a href="javascript:;">Output</a></li>
+                <li><a href="javascript:;">Pointers</a></li>
+                <li><a href="javascript:;">Matrix</a></li>
               </ul>
             </li>
 
@@ -356,74 +440,39 @@
    <div class="container" style="position: relative;">
 
       <div class="col-sm-9">
+      
           <div class="panel panel-primary">
             <div class="panel-heading">
               <h3 class="panel-title"> <%out.print( "Welcome " + username + "!"); %> </h3>
             </div>
-          <div class="panel-body">   
-
-          </div>  
-        </div>
-      </div>
-
-
-        <!-- right panel -->
-        <div class="col-sm-3">
-          <div class="row" id="alertTipRow">     
-              <div id="alertTip" class="alert alert-dismissible alert-info">
-              	<!--  <button id="challengeTipClose" type="button" class="close" data-dismiss="alert" >&times;</button> -->
-                <button id="challengeTipClose" type="button" style="outline:none;" class="close">&times;</button>
-                <strong>Quick Tip!</strong> <br> Click on your online friends to send them a challenge. <hr id="alertHR"> Click on your friend requests to accept or reject.
-              </div>  
-          </div>
-
-          <!-- online friends 
-          <div class="row" id="_OnlineFriends">
-            <div class="list-group">
-              <div class="list-group-item active">  Online Friends <span class="badge"> <i class="fa fa-user" aria-hidden="true"></i> 2 </span> </div>
-              <a href="javascript:;" class="list-group-item" data-toggle="tooltip2" data-placement="right" title="" data-original-title="Click to challenge!"><i id="available" class="fa fa-dot-circle-o" aria-hidden="true"></i>  Dapibus ac facilisis in</a>
-              <a href="javascript:;" class="list-group-item" data-toggle="tooltip2" data-placement="right" title="" data-original-title="Currently in game!"><i id="notavailable" class="fa fa-dot-circle-o" aria-hidden="true"></i> Morbi leo risus</a>
-            </div>
-          </div>
-          -->
+	        <div class="panel-body"> 
+	       <div class="row">  
+			<div class="col-sm-4">
+			  <div id="avatar" style="<%out.print(userImage);%>"></div>
+	        </div>
+	        <div class="col-sm-2"></div>
+	        <div class="col-sm-6">
+			
+    		  
+	        </div>      	        
+           </div>	  <!--  row -->
           
-          <%
-          if(friendList != null && friendList.size() >  0)
-          {
-        	  out.write("<div class=\"row\" id=\"_OnlineFriends\">");
-        	  out.write("<div class=\"list-group\">");
-              out.write("<div class=\"list-group-item active\">  Online Friends <span class=\"badge\"> <i class=\"fa fa-user\" aria-hidden=\"true\"></i> 2 </span> </div>");
-
-              
-              for(String friend : friendList)
-              {
-            	  // available
-            	  out.write("<a href=\"javascript:;\" class=\"list-group-item\" data-toggle=\"tooltip2\" data-placement=\"right\" title=\""+ friend + "\" data-original-title=\"Click to challenge!\"><i id=\"available\" class=\"fa fa-dot-circle-o\" aria-hidden=\"true\"></i>" + friend + "</a>");
-              	  // not available
-              	  out.write("<a href=\"javascript:;\" class=\"list-group-item\" data-toggle=\"tooltip2\" data-placement=\"right\" title=\""+ friend + "\" data-original-title=\"Currently in game!\"><i id=\"notavailable\" class=\"fa fa-dot-circle-o\" aria-hidden=\"true\"></i> Morbi leo risus</a>");
-              }
-              
-              out.write("</div>");
-              out.write("</div>");
-          }              
-          %>
-          
-          
-          
-          
-          <div class="row" id="_OnlineList">
+		<div class="row" style="margin-top:25px;">
+          <div class="col-sm-5" id="_OnlineList">
           <div class="panel-group wrap" id="accordion" role="tablist" aria-multiselectable="true">
       <div class="panel">
         <div class="panel-heading" role="tab" id="headingOne">
           <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Collapsible item #1
+          <i class="fa fa-frown-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hande vs tugcan
         </a>
       </h4>
         </div>
         <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
           <div class="panel-body">
-            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch.
+            Result: LOST <br>
+            hande: 132 points <br>
+            tugcan: 133 points <br>
           </div>
         </div>
       </div>
@@ -433,7 +482,7 @@
         <div class="panel-heading" role="tab" id="headingTwo">
           <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-          Collapsible item #2
+          <i class="fa fa-trophy" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hande vs melda
         </a>
       </h4>
         </div>
@@ -449,7 +498,7 @@
         <div class="panel-heading" role="tab" id="headingThree">
           <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          Collapsible item #3
+          <i class="fa fa-trophy" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hande vs tugcan
         </a>
       </h4>
         </div>
@@ -465,7 +514,7 @@
         <div class="panel-heading" role="tab" id="headingFour">
           <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-          Collapsible item #4
+          <i class="fa fa-frown-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hande vs doruk
         </a>
       </h4>
         </div>
@@ -480,41 +529,94 @@
     </div>
     <!-- end of #accordion -->
           
+      </div> <!-- column 5 -->    
+      <div class="col-sm-1"></div>
+      <div class="col-sm-5">
+      
+			  <!--  GRAPH  -->
+
+				<div class="widget">
+				    <div id="header">Statistics</div>
+				    <div id="chart" class="chart-container"></div>
+				</div>
+    		  
+      </div>
+      
+        
+      </div> <!--  row -->
+      </div>  <!--  panel body -->
+      </div>    <!--  panel -->                
+ 
+        
+        
+        
+   <div class="row">   
+  
+   </div>
+        
+        <div class="row"> <!--  LEADERBOARD  -->
+        
+       <div class="panel panel-primary">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">Leaderboard</h3>
+		  </div>
+		  <div class="panel-body">
+		    
+
+
+
+
+		  </div>
+		</div>
+        
+       
+        </div>
+        
+        
+      </div> <!--  column -->
+
+
+        <!-- right panel -->
+        <div class="col-sm-3" id="pad">
+     
+          <div class="row" id="alertTipRow">     
+              <div id="alertTip" class="alert alert-dismissible alert-info">
+              	<!--  <button id="challengeTipClose" type="button" class="close" data-dismiss="alert" >&times;</button> -->
+                <button id="challengeTipClose" type="button" style="outline:none;" class="close">&times;</button>
+                <strong>Quick Tip!</strong> <br> Click on your online friends to send them a challenge. <hr id="alertHR"> Click on your friend requests to accept or reject.
+              </div>  
           </div>
-                 
-           <!-- requests 
-          <div class="row" id="_FriendRequests">
+
+          <!-- online friends -->
+          <div class="row" id="_OnlineFriends">
             <div class="list-group">
-              <div>
-                <div class="list-group-item active">
-                Friend Requests
-                <span class="badge" id="_RequestCount"> <i class="fa fa-user-plus" aria-hidden="true"></i> 3 </span> 
-                </div>
-              </div>
+              <div class="list-group-item active">  Online Friends <span class="badge"> <i class="fa fa-user" aria-hidden="true"></i> 2 </span> </div>
+              <a href="javascript:;" class="list-group-item" data-toggle="tooltip2" data-placement="right" title="" data-original-title="Click to challenge!"><i id="available" class="fa fa-dot-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;melda</a>
+              <a href="javascript:;" class="list-group-item" data-toggle="tooltip2" data-placement="right" title="" data-original-title="Currently in game!"><i id="notavailable" class="fa fa-dot-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tugcan</a>
+	        </div>
+          </div>
+         
+          
+          <%
+          if(friendList != null && friendList.size() >  0)
+          {
+        	  out.write("<div class=\"row\" id=\"_OnlineFriends\">");
+        	  out.write("<div class=\"list-group\">");
+              out.write("<div class=\"list-group-item active\">  Online Friends <span class=\"badge\"> <i class=\"fa fa-user\" aria-hidden=\"true\"></i> 2 </span> </div>");
+
               
-		      <div>
-                <div id="request" class="list-group-item" aria-labelledby="Fatih Terim">Fatih Terim
-                  <a href="javascript:;" class="reject"> <span id="times" class="badge"> <i class="fa fa-times" aria-hidden="true"></i> </span> </a> 
-                  <a href="javascript:;" class="accept"> <span id="check" class="badge"> <i class="fa fa-check" aria-hidden="true"></i> </span> </a>
-                </div>
-		      </div>
-		     
-			  <div>
-                <div id="request" class="list-group-item" aria-labelledby="Aragones">Aragones
-                  <a href="javascript:;" class="reject"> <span id="times"  class="badge"> <i class="fa fa-times" aria-hidden="true"></i> </span> </a>
-                  <a href="javascript:;" class="accept"> <span id="check"  class="badge"> <i class="fa fa-check" aria-hidden="true"></i> </span> </a>
-                </div>
-		      </div>
-		      
-		      <div>
-                <div id="request" class="list-group-item" aria-labelledby="Can Sissoko">Can Sissoko
-                  <a href="javascript:;" class="reject"> <span id="times" class="badge"> <i class="fa fa-times" aria-hidden="true"></i> </span> </a> 
-                  <a href="javascript:;" class="accept"> <span id="check" class="badge"> <i class="fa fa-check" aria-hidden="true"></i> </span> </a>
-                </div>
-              </div>         		   
+              for(String friend : friendList)
+              {
+            	  // available
+            	  out.write("<a href=\"javascript:;\" class=\"list-group-item\" data-toggle=\"tooltip2\" data-placement=\"right\" title=\""+ friend + "\" data-original-title=\"Click to challenge!\"><i id=\"available\" class=\"fa fa-dot-circle-o\" aria-hidden=\"true\"></i>" + friend + "</a>");
+              	  // not available
+              	  out.write("<a href=\"javascript:;\" class=\"list-group-item\" data-toggle=\"tooltip2\" data-placement=\"right\" title=\""+ friend + "\" data-original-title=\"Currently in game!\"><i id=\"notavailable\" class=\"fa fa-dot-circle-o\" aria-hidden=\"true\"></i>" + friend + "</a>");
+              }
               
-            </div>
-          </div> -->
+              out.write("</div>");
+              out.write("</div>");
+          }              
+          %>        
           
           <%
           // GENERATE FRIEND REQUEST LIST
@@ -551,6 +653,7 @@
       			<strong><i class="fa fa-info-circle" aria-hidden="true"></i></strong> message
     		  </div>
           </div>
+    
         </div> 
     </div>
     
@@ -562,43 +665,10 @@
 
 
         <script>		
-		/*
-		$('div.list-group').on('click', 'a.reject , a.accept', function(e) {
-    		e.preventDefault();
-		    if ($(this).hasClass('changeLink')) {
-		        var div = $(this).closest('div');
-		        var title = li.children('span.title').text();
-		        li.children('span.title').empty()
-		            .append('<input type="text" value="' + title + '" />');
-		        $(this).removeClass('changeLink')
-		               .addClass('saveLink').text('Save');
-		    }
-		    else if ($(this).hasClass('saveLink')) {
-		        var li = $(this).closest('li');
-		        var id = li.attr('data-id');
-		        var title = li.children('span.title').find('input').val();
-		        li.children('span.title').text(title);
-		        $(this).removeClass('saveLink')
-		               .addClass('changeLink').text('Change');
-		        //$.post('updatetitle.php',
-		        // { 'id': id, 'title': title }, function(){ alert('OK'); });
-		    }
-		});
-	*/	
-		
-       /*   $(function() {
-            $("#friends a").click(function() {
-              var friend_name = $("#friends").text();
-              console.log(friend_name);
-
-            });
-          }); */
-
   
         /***************** ALL JQUERY CODE GOES IN HERE *****************/  
         /* $(document).ready(function(){}) prevents any jQuery code 
         from running before the document is fully loaded (is ready). */
-        /*setTimeout(function () {waitingDialog.hide();}, 3000); */
         
 		var waitingDialog = waitingDialog || (function ($) {
 		    'use strict';
@@ -659,10 +729,129 @@
 					$dialog.modal('hide');
 				}
 			};
-
 		})(jQuery);
                    
         $(document).ready(function(){
+        	// GRAPH 2
+        	
+        	var dataset = [
+               { name: 'WIN', percent: 39.10 },
+               { name: 'LOSE', percent: 32.51 },
+               { name: 'QUIT', percent: 13.68 },
+           ];
+
+           var pie=d3.layout.pie()
+                   .value(function(d){return d.percent})
+                   .sort(null)
+                   .padAngle(.03);
+
+           var w=300,h=300;
+
+           var outerRadius=w/2;
+           var innerRadius=100;
+
+          //var color = d3.scale.category10();
+          
+           var color = d3.scale.ordinal()
+			.range(["#18B07D", "#E74C3C" , "#F39C12"]);
+
+           var arc=d3.svg.arc()
+                   .outerRadius(outerRadius)
+                   .innerRadius(innerRadius);
+
+           var svg=d3.select("#chart")
+                   .append("svg")
+                   .attr({
+                       width:w,
+                       height:h,
+                       class:'shadow'
+                   }).append('g')
+                   .attr({
+                       transform:'translate('+w/2+','+h/2+')'
+                   });
+           var path=svg.selectAll('path')
+                   .data(pie(dataset))
+                   .enter()
+                   .append('path')
+                   .attr({
+                       d:arc,
+                       fill:function(d,i){
+                           return color(d.data.name);
+                       }
+                   });
+
+           path.transition()
+                   .duration(1000)
+                   .attrTween('d', function(d) {
+                       var interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
+                       return function(t) {
+                           return arc(interpolate(t));
+                       };
+                   });
+
+
+           var restOfTheData=function(){
+               var text=svg.selectAll('text')
+                       .data(pie(dataset))
+                       .enter()
+                       .append("text")
+                       .transition()
+                       .duration(200)
+                       .attr("transform", function (d) {
+                           return "translate(" + arc.centroid(d) + ")";
+                       })
+                       .attr("dy", ".4em")
+                       .attr("text-anchor", "middle")
+                       .text(function(d){
+                           return d.data.percent+"%";
+                       })
+                       .style({
+                           fill:'#fff',
+                           'font-size':'10px'
+                       });
+
+               var legendRectSize=20;
+               var legendSpacing=12;
+               var legendHeight=legendRectSize+legendSpacing;
+
+               var legend=svg.selectAll('.legend')
+                       .data(color.domain())
+                       .enter()
+                       .append('g')
+                       .attr({
+                           class:'legend',
+                           transform:function(d,i){
+                               //Just a calculation for x & y position
+                               return 'translate(-35,' + ((i*legendHeight)-45) + ')';
+                           }
+                       });
+               legend.append('rect')
+                       .attr({
+                           width:legendRectSize,
+                           height:legendRectSize,
+                           rx:20,
+                           ry:20
+                       })
+                       .style({
+                           fill:color,
+                           stroke:color
+                       });
+
+               legend.append('text')
+                       .attr({
+                           x:30,
+                           y:15
+                       })
+                       .text(function(d){
+                           return d;
+                       }).style({
+                           fill:'#929DAF',
+                           'font-size':'14px'
+                       });
+           };
+
+           setTimeout(restOfTheData,1000);	
+        	
            var timeoutHandle;   // handle timeouts (reset)    
            
            /* show tooltips */

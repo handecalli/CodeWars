@@ -54,7 +54,7 @@ public class QuestionServlet extends HttpServlet {
 				questionService.AddQuestionMultiple(q);
 			}
 		}
-		
+		// besides multiple choice quizes there will be coding quizes in the future
 		else if(request.getParameter("dothis").equals("Get"))
 		{
 			//String type = request.getParameter("type");

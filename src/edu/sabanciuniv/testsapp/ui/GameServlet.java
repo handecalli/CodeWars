@@ -37,8 +37,8 @@ public class GameServlet extends HttpServlet {
     
     
     // state = 0  ->  waiting for another player
-    // state = 1  ->  waiting for player answers
-    // state = 2  ->  show correct answer to players
+    // state = 1  ->  game in progress
+    // state = 2  ->  waiting other player to show results
     // state = 3  ->  game has finished
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
@@ -52,16 +52,13 @@ public class GameServlet extends HttpServlet {
 			String player1 = user.getUsername();
 			String type = request.getParameter("type");
 			
-			System.out.println("sent ajax parameter (type): " + type);
-			
 			GameService gameservice = new GameService();
 			try {
 				game = gameservice.JoinOrCreateRandomGame(player1, type);
 			} catch (SQLException e) {
 				//e.printStackTrace();
 			}
-			System.out.println("(game servlet) Game state: " + game.getState());
-			
+
 			if(game != null && game.getState() == 0) //player has to wait for opponent
 			{
 				System.out.println(user.getUsername() + " has created the game with ID " + game.getGameID() + " and waiting for an opponent.");
@@ -76,9 +73,7 @@ public class GameServlet extends HttpServlet {
 			}
 			
 			else if(game != null && game.getState() == 1)	//game can start
-			{							
-				System.out.println(user.getUsername() + " has joined the game with ID " + game.getGameID() + ".");
-				
+			{									
 				request.getSession().setAttribute("game", game);	
 				
 				JSONObject json = new JSONObject();
@@ -103,15 +98,7 @@ public class GameServlet extends HttpServlet {
 		{
 			GameService gameservice = new GameService();
 			try {
-				gameservice.CheckPlayerJoin(game);
-				
-				if(game.getState() == 0)
-					System.out.println(user.getUsername() + " is still waiting for an opponent.");
-				else if(game.getState() == 1)
-					System.out.println(user.getUsername() + " has found an opponent.");
-				else
-					System.out.println(user.getUsername() + "'s game has finished?");
-				
+				gameservice.CheckPlayerJoin(game);				
 			} catch (SQLException e) {
 				//e.printStackTrace();
 			}
@@ -131,5 +118,4 @@ public class GameServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
 }

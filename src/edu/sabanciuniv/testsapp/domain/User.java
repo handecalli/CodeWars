@@ -9,13 +9,13 @@ public class User {
 	    private int points, rating;
 	    private List<String> friendReq;
 	    private List<String> friendList;
-	    private byte[] image;
+	    private int imageID;
 	    
 	    public User() {
 	        super();
 	    }
 
-		public User(String username, int points, int rating, String usertype, List<String> friendReq, List<String> friendList, byte[] image ) {
+		public User(String username, int points, int rating, String usertype, List<String> friendReq, List<String> friendList, int imageID ) {
 			super();
 			this.setUsername(username);
 			this.setPoints(points);
@@ -23,7 +23,7 @@ public class User {
 			this.setUsertype(usertype);
 			this.setFriendReq(friendReq);
 			this.setFriendList(friendList);
-			this.setImage(image);
+			this.setImageID(imageID);
 		}
 		
 		public int getRating() {
@@ -74,12 +74,12 @@ public class User {
 			this.usertype = usertype;
 		}
 
-		public byte[] getImage() {
-			return image;
+		public int getImageID() {
+			return imageID;
 		}
 
-		public void setImage(byte[] image) {
-			this.image = image;
+		public void setImageID(int imageID) {
+			this.imageID = imageID;
 		}
 	    
 	    

@@ -44,9 +44,18 @@
 		    }
 		    
 		    body{
-		    	padding-top: 100px;
+		    	padding-top: 140px;
 		    	padding-bottom: 60px;
 		    }
+		    
+	    	.navbar-nav {
+			  width: 100%;
+			  text-align: center;
+			}
+			.navbar-nav > li {
+			  float: none;
+			  display: inline-block;
+			}
           </style>
 </head>
 
@@ -80,60 +89,15 @@
 		}		
 	%>
 
-   <div class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <a href="../" class="navbar-brand">Bootswatch</a>
-          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-        </div>
-        <div class="navbar-collapse collapse" id="navbar-main">
-          <ul class="nav navbar-nav">
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">Themes <span class="caret"></span></a>
-              <ul class="dropdown-menu" aria-labelledby="themes">
-                <li><a href="../default/">Default</a></li>
-                <li class="divider"></li>
-                <li><a href="../cerulean/">Cerulean</a></li>
-                <li><a href="../cosmo/">Cosmo</a></li>
-                <li><a href="../cyborg/">Cyborg</a></li>
-                <li><a href="../darkly/">Darkly</a></li>
-              </ul>
-            </li>
-            <li>
-              <a href="../help/">Help</a>
-            </li>
-            <li>
-              <a href="http://news.bootswatch.com">Blog</a>
-            </li>
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download" aria-expanded="false">Sandstone <span class="caret"></span></a>
-              <ul class="dropdown-menu" aria-labelledby="download">
-                <li><a href="http://jsfiddle.net/bootswatch/m0nv7a0o/">Open Sandbox</a></li>
-                <li class="divider"></li>
-                <li><a href="./bootstrap.min.css">bootstrap.min.css</a></li>
-                <li><a href="./bootstrap.css">bootstrap.css</a></li>
-                <li class="divider"></li>
-                <li><a href="./variables.less">variables.less</a></li>
-                <li><a href="./bootswatch.less">bootswatch.less</a></li>
-                <li class="divider"></li>
-                <li><a href="./_variables.scss">_variables.scss</a></li>
-                <li><a href="./_bootswatch.scss">_bootswatch.scss</a></li>
-              </ul>
-            </li>
-          </ul>
-
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="http://builtwithbootstrap.com/" target="_blank">Built With Bootstrap</a></li>
-            <li><a href="https://wrapbootstrap.com/?ref=bsw" target="_blank">WrapBootstrap</a></li>
-          </ul>
-
-        </div>
-      </div>
-    </div>
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+	  <div class="container-fluid">
+	    <div class="navbar-main">
+	      <ul class="nav navbar-nav" >
+	        <li><a style="font-size: 22px;" href="javascript:;">Code Wars</a></li>
+	      </ul>
+	    </div>
+	  </div>
+	</nav>
 
 	<div class="container" style="position: relative;">
 	
@@ -166,7 +130,7 @@
 				  <div class="panel-body">
 				  	Progress
 					<div class="progress progress-striped active">
-						<div class="progress-bar" style="width: 50%"></div>
+						<div class="progress-bar" style="width: <%out.print(questionIndex*100/7);%>%"></div>
 					</div>
 
 				  </div>
@@ -187,7 +151,7 @@
 				  <div class="panel-body">
 				  	Progress
 				  <div class="progress progress-striped active">
-						<div class="progress-bar" style="width: 90%"></div>
+						<div class="progress-bar" style="width: <%out.print(questionIndex*100/7);%>%"></div>
 					</div>
 				  </div>
 				</div>
@@ -210,10 +174,10 @@
 		<div class="row">
 		<div class="col-sm-2"></div>
 		<div class="col-sm-8 ">
-			<a href="AnswerServlet?userAnswer=A&correctAnswer=<%out.print(optCorrect);%>" id="optA" class="btn btn-primary btn-lg btn-block" style="white-space: normal;"><% out.print(optA); %></a>
-			<a href="AnswerServlet?userAnswer=B&correctAnswer=<%out.print(optCorrect);%>" id="optB" class="btn btn-primary btn-lg btn-block" style="white-space: normal;"><% out.print(optB); %></a>
-			<a href="AnswerServlet?userAnswer=C&correctAnswer=<%out.print(optCorrect);%>" id="optC" class="btn btn-primary btn-lg btn-block" style="white-space: normal;"><% out.print(optC); %></a>
-			<a href="AnswerServlet?userAnswer=D&correctAnswer=<%out.print(optCorrect);%>" id="optD" class="btn btn-primary btn-lg btn-block" style="white-space: normal;"><% out.print(optD); %></a>
+			<a href="javascript:;" id="optA" class="btn btn-primary btn-lg btn-block" style="white-space: normal;" onclick="submitAnswer('A', '<%out.print(optCorrect);%>', '<%out.print(questionIndex);%>')"><% out.print(optA); %></a>
+			<a href="javascript:;" id="optB" class="btn btn-primary btn-lg btn-block" style="white-space: normal;" onclick="submitAnswer('B', '<%out.print(optCorrect);%>', '<%out.print(questionIndex);%>')"><% out.print(optB); %></a>
+			<a href="javascript:;" id="optC" class="btn btn-primary btn-lg btn-block" style="white-space: normal;" onclick="submitAnswer('C', '<%out.print(optCorrect);%>', '<%out.print(questionIndex);%>')"><% out.print(optC); %></a>
+			<a href="javascript:;" id="optD" class="btn btn-primary btn-lg btn-block" style="white-space: normal;" onclick="submitAnswer('D', '<%out.print(optCorrect);%>', '<%out.print(questionIndex);%>')"><% out.print(optD); %></a>
 		</div>
 		<div class="col-sm-2"></div>
 		</div>
@@ -225,6 +189,69 @@
 
 
       <script>
+      
+      var waitingDialog = waitingDialog || (function ($) {
+		    'use strict';
+
+			// Creating modal dialog's DOM
+			var $dialog = $(
+				'<div class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true" style="padding-top:15%; overflow-y:visible;">' +
+				'<div class="modal-dialog modal-m">' +
+				'<div class="modal-content">' +
+					'<div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> <h3 style="margin:0;"></h3></div>' +
+					'<div class="modal-body">' +
+						'<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
+					'</div>' +
+				'</div></div></div>');
+
+			return {
+				/**
+				 * Opens our dialog
+				 * @param message Custom message
+				 * @param options Custom options:
+				 * 				  options.dialogSize - bootstrap postfix for dialog size, e.g. "sm", "m";
+				 * 				  options.progressType - bootstrap postfix for progress bar type, e.g. "success", "warning".
+				 */
+				show: function (message, options) {
+					// Assigning defaults
+					if (typeof options === 'undefined') {
+						options = {};
+					}
+					if (typeof message === 'undefined') {
+						message = 'Loading';
+					}
+					var settings = $.extend({
+						dialogSize: 'm',
+						progressType: '',
+						onHide: null // This callback runs after the dialog was hidden
+					}, options);
+
+					// Configuring dialog
+					$dialog.find('.modal-dialog').attr('class', 'modal-dialog').addClass('modal-' + settings.dialogSize);
+					$dialog.find('.progress-bar').attr('class', 'progress-bar');
+					if (settings.progressType) {
+						$dialog.find('.progress-bar').addClass('progress-bar-' + settings.progressType);
+					}
+					$dialog.find('h3').text(message);
+					// Adding callbacks
+					if (typeof settings.onHide === 'function') {
+						$dialog.off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
+							settings.onHide.call($dialog);
+						});
+					}
+					// Opening dialog
+					$dialog.modal();
+				},
+				/**
+				 * Closes dialog
+				 */
+				hide: function () {
+					$dialog.modal('hide');
+				}
+			};
+
+		})(jQuery);
+      
 		$(document).ready(function(){
 			
             $("#CountDownTimer").TimeCircles({
@@ -257,9 +284,10 @@
                     }
                 }
             }).addListener(function(unit, value, total) {
-                  if(total <= 0) {
-                    // Do whatever you want to happen when the timer reaches 0 here
-
+                  if(total <= 0) {		// automatically redirect page when time is up
+                	//var url = "AnswerServlet?userAnswer=timeout&correctAnswer=timeout&timeLeft=0";          			
+                	//document.location.href = url;	
+                	submitAnswer("timeout", "<%out.print(optCorrect);%>", <%out.print(questionIndex);%>);
                   }
                   else if(total <= 5){
                    // $("#CountDownTimer").TimeCircles({ time: { Days: { show:false }, Hours: { show:false }, Minutes: { show:false }, Seconds: { color: '#900' } } })
@@ -267,9 +295,113 @@
                     $("#CountDownTimer").TimeCircles().end().fadeIn();                    
                  }
              });
-		  });
+		  });		
 		
-		
+		 function submitAnswer(playerAnswer, correctAnswer, questionIndex) {
+			 		 
+		 $("#CountDownTimer").TimeCircles().stop(); 
+			var timeLeft = $("#CountDownTimer").TimeCircles().getTime();			
+			
+			var userOption = "#opt".concat(playerAnswer);
+			var correctOption = "#opt".concat(correctAnswer);
+			
+			if(playerAnswer != correctAnswer && playerAnswer != "timeout")				
+				$(userOption).removeClass("btn-primary").addClass("btn-danger");
+			if(playerAnswer != "timeout")
+				$(correctOption).removeClass("btn-primary").addClass("btn-success");
+			else
+			{
+				$(correctOption).removeClass("btn-primary").addClass("btn-warning");
+				timeLeft = 0;
+			}
+			
+			//	$dialog.find('.modal-dialog').attr('arialabelledby', 'modal-dialog').addClass('modal-' + settings.dialogSize);
+		 
+
+			//var base = "AnswerServlet?userAnswer=";
+			//var url = base.concat(playerAnswer, "&correctAnswer=", correctAnswer, "&timeLeft=", timeLeft);
+					
+			//document.location.href = url;
+			
+			$.ajax({   		   
+	   		    // The URL for the request
+	   		    url: "AnswerServlet",
+	   		 
+	   		    // The data to send (will be converted to a query string)
+	   		    data: {
+	   		    	   userAnswer : playerAnswer,
+	    			   correctAnswer : correctAnswer,
+	    			   timeLeft : timeLeft
+	        	   },
+	   		 
+	   		    // Whether this is a POST or GET request
+	   		    type: "GET",
+	   		 
+	   		    // The type of data we expect back
+	   		    //dataType : "application/json",
+	   		    
+	   		    //the type of the request body. 
+	   		    contentType: "application/json",
+	   		    
+	   		    // Whether to use a cached response if available
+	   		    cache : false     		   
+	   		}).done(function(response) {   			
+				if(questionIndex == 6)
+				{
+		   			console.log("waiting for opponent..");
+					waitingDialog.show('Waiting for your opponent to finish...');
+					waitOpponent();
+				}
+				else if(questionIndex < 6)
+					document.location.href = "MultipleChoice.jsp";
+	   		})
+		 }
+			
+		function waitOpponent() {
+					
+			 $.ajax({   		   
+		   		    // The URL for the request
+		   		    url: "ShowResultServlet",
+		   		 
+		   		    // The data to send (will be converted to a query string)
+		   		    data: {
+							type: "multiple"
+		        	   },
+		   		 
+		   		    // Whether this is a POST or GET request
+		   		    type: "GET",
+		   		 
+		   		    // The type of data we expect back
+		   		    //dataType : "application/json",
+		   		    
+		   		    //the type of the request body. 
+		   		    contentType: "application/json",
+		   		    
+		   		    // Whether to use a cached response if available
+		   		    cache : false     		   
+		   		})
+		   		  // Code to run if the request succeeds (is done);
+		   		  // The response is passed to the function
+		   		.done(function(response) {
+		   			console.log("state: " + response.state);
+		   			if(response.state != 3) // waiting
+		   			{
+		   				//loading results modal pıliiiz
+		   				setTimeout(function(){		// CHECK IF THE OPPONENT FINISHED ANSWERING, EVERY 3 SECONDS
+		   					waitOpponent();
+		   			    }, 3000);
+		   			}
+		   			else 
+		   				window.location.href = "/TestWeb/showResults.jsp";
+		   		})
+		   		.fail(function( xhr, status, errorThrown ) {
+
+						console.log( "Error: " + errorThrown );
+						console.log( "Status: " + status );
+						console.dir( xhr );
+		   		})
+		}
+			
       </script>     
 	</body>
 

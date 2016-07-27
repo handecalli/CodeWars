@@ -41,6 +41,16 @@ body{
 	padding-bottom: 60px;
 }
 
+	.navbar-nav {
+	  width: 100%;
+	  text-align: center;
+	}
+	.navbar-nav > li {
+	  float: none;
+	  display: inline-block;
+	}
+
+
 h2 {
     margin-bottom: 30px;
     color: #4679bd;
@@ -252,341 +262,322 @@ p.footer {
 <body>
 
 	<%
-// 		Game game =(Game)request.getSession().getAttribute("game");	
-// 		List<Question> questionList = game.getQuestionList();
+ 		Game game =(Game)request.getSession().getAttribute("game");	
+ 		List<Question> questionList = game.getQuestionList();
 		
-// 		int questionCount = 0;
-// 		String player1 = "";
-// 		String player2 = "";
-// 		List<String> player1Answers = null;
-// 		List<String> player2Answers = null;
-		
-// 		User curUser = (User)request.getSession().getAttribute("user");
-// 		if(curUser.getUsername().equals(game.getPlayer1()))
-// 		{
-// 			player1 = game.getPlayer1();
-// 			player1Answers = game.getPlayer1Answers();
+ 		int questionIndex = 0;
+ 		String player1 = "";
+ 		String player2 = "";
+ 		List<String> player1Answers = null;
+ 		List<String> player2Answers = null;
+ 		List<Integer> player1Times = null;
+ 		List<Integer> player2Times = null;
+ 		List<Integer> player1Correctness = null; 
+ 		List<Integer> player2Correctness = null;
+ 		int player1TotalScore = 0;
+ 		int player2TotalScore = 0;
+ 		String winner = game.getWinner();
+ 		
+ 		User curUser = (User)request.getSession().getAttribute("user");
+ 		if(curUser.getUsername().equals(game.getPlayer1()))
+ 		{
+ 			player1 = game.getPlayer1();
+ 			player1Answers = game.getPlayer1Answers();
+ 			player1Times = game.getPlayer1Times();
+ 			player1Correctness = game.getPlayer1Correctness();
+ 			player1TotalScore = game.getPlayer1TotalScore();
 			
-// 			player2 = game.getPlayer2();	
-// 			player2Answers = game.getPlayer2Answers();		
-// 		}
-// 		else
-// 		{
-// 			player2 = game.getPlayer1();
-// 			player2Answers = game.getPlayer1Answers();
-			
-// 			player1 = game.getPlayer2();
-// 			player1Answers = game.getPlayer2Answers();	
-// 		}		
+ 			player2 = game.getPlayer2();	
+ 			player2Answers = game.getPlayer2Answers();		
+ 			player2Times = game.getPlayer2Times();
+ 			player2Correctness = game.getPlayer2Correctness();
+ 			player2TotalScore = game.getPlayer2TotalScore();
+ 		}
+ 		else
+ 		{
+ 			player2 = game.getPlayer1();
+ 			player2Answers = game.getPlayer1Answers();
+ 			player2Times = game.getPlayer1Times();
+ 			player2Correctness = game.getPlayer1Correctness();
+ 			player2TotalScore = game.getPlayer1TotalScore();
+	
+ 			player1 = game.getPlayer2();
+ 			player1Answers = game.getPlayer2Answers();	
+ 			player1Times = game.getPlayer2Times();
+ 			player1Correctness = game.getPlayer2Correctness();
+ 			player1TotalScore = game.getPlayer2TotalScore();
+ 		}		
 	%>
 
 
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-main">
+      <ul class="nav navbar-nav" >
+        <li><a style="font-size: 22px;" href="/TestWeb/UserMain.jsp">Code Wars</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-<h2><i class="fa fa-trophy" aria-hidden="true"></i> You win!</h2>
-<h2><i class="fa fa-frown-o" aria-hidden="true"></i> You lost!</h2>
+<% 
+	if(winner.equals(curUser.getUsername()))
+		out.write("<h2><i class=\"fa fa-trophy\" aria-hidden=\"true\"></i> You win!</h2>");
+	else
+		out.write("<h2><i class=\"fa fa-frown-o\" aria-hidden=\"true\"></i> You lost!</h2>");
+	out.write("<h2>" + player1TotalScore + " - " + player2TotalScore + "</h2>");
+%>
 
 <ul class="timeline">
 	
 	<%
-// 	for(Question currentQuestion : questionList)
-// 	{
-// 		String strQuestion = currentQuestion.getQuestion();
-// 		String optA = currentQuestion.getOptionA();
-// 		String optB = currentQuestion.getOptionB();
-// 		String optC = currentQuestion.getOptionC();
-// 		String optD = currentQuestion.getOptionD();
-// 		String optCorrect = currentQuestion.getAnswer();
-// 		questionCount++;
+	for(Question currentQuestion : questionList)
+	{
+		String strQuestion = currentQuestion.getQuestion();
+		String optA = currentQuestion.getOptionA();
+		String optB = currentQuestion.getOptionB();
+		String optC = currentQuestion.getOptionC();
+		String optD = currentQuestion.getOptionD();
+		String optCorrect = currentQuestion.getAnswer();
+		
+		String optPlayer1 = player1Answers.get(questionIndex);	
+		int timePlayer1 = 25 - player1Times.get(questionIndex);
+		int correctnessPlayer1 = player1Correctness.get(questionIndex);
+		
+		String optPlayer2 = player2Answers.get(questionIndex);
+		int timePlayer2 = 25 - player2Times.get(questionIndex);
+		int correctnessPlayer2 = player2Correctness.get(questionIndex);
+		
+		questionIndex++;
+		
+		String resultPlayer1 = "Correct answer!";
+		String resultPlayer2 = "Correct answer!";
+		
+		if(timePlayer1 == 25)
+			resultPlayer1 = "Out of time!";
+		else if(correctnessPlayer1 == 0)
+			resultPlayer1 = "Wrong answer!";
+		
+		if(timePlayer2 == 25)
+			resultPlayer2 = "Out of time!";
+		else if(correctnessPlayer2 == 0)
+			resultPlayer2 = "Wrong answer!";
 		
 		
-// 		// PLAYER 1 (left side)
-// 		out.write("<li>");
-// 		out.write("<div class=\"timeline-badge\">");
-// 		out.write("<a><i class=\"fa fa-circle\" id=\"\"></i></a>");
-// 		out.write("</div>");
-// 		out.write(" <div class=\"timeline-panel\">");
-// 		out.write("<div class=\"timeline-heading\">");
-// 		out.write("Question " + questionCount);
-// 		out.write("</div>");
-// 		out.write("<div class=\"timeline-body\">");
-// 		out.write("Question " + questionCount);					////////////
-// 		out.write("</div>");
-// 		out.write("<div class=\"timeline-footer\">");
-// 		out.write("<p class=\"text-right\">Feb-21-2014</p>");	////////////
-// 		out.write("</div>");
-// 		out.write("</div>");
-// 		out.write("</li>");
+		String optA1 = "btn-primary";
+		String optB1 = "btn-primary";
+		String optC1 = "btn-primary";
+		String optD1 = "btn-primary";
+		String optA2 = "btn-primary";
+		String optB2 = "btn-primary";
+		String optC2 = "btn-primary";
+		String optD2 = "btn-primary";
+		
+		
+		if( timePlayer1 == 25)
+		{
+			if(optCorrect.equals("A"))
+				optA1 = "btn-warning";
+			else if(optCorrect.equals("B"))
+				optB1 = "btn-warning";
+			else if(optCorrect.equals("C"))
+				optC1 = "btn-warning";
+			else if(optCorrect.equals("D"))
+				optD1 = "btn-warning";
+		}
+		
+		else
+		{
+			if(optCorrect.equals("A"))
+			{
+				optA1 = "btn-success";
+				if(optPlayer1.equals("B"))
+					optB1 = "btn-danger";
+				else if(optPlayer1.equals("C"))
+					optC1 = "btn-danger";
+				else if(optPlayer1.equals("D"))
+					optD1 = "btn-danger";			
+			}
+			
+			else if(optCorrect.equals("B"))
+			{
+				optB1 = "btn-success";
+				if(optPlayer1.equals("A"))
+					optA1 = "btn-danger";
+				else if(optPlayer1.equals("C"))
+					optC1 = "btn-danger";
+				else if(optPlayer1.equals("D"))
+					optD1 = "btn-danger";			
+			}
+			
+			else if(optCorrect.equals("C"))
+			{
+				optC1 = "btn-success";
+				if(optPlayer1.equals("B"))
+					optB1 = "btn-danger";
+				else if(optPlayer1.equals("A"))
+					optA1 = "btn-danger";
+				else if(optPlayer1.equals("D"))
+					optD1 = "btn-danger";			
+			}
+			
+			else if(optCorrect.equals("D"))
+			{
+				optD1 = "btn-success";
+				if(optPlayer1.equals("B"))
+					optB1 = "btn-danger";
+				else if(optPlayer1.equals("C"))
+					optC1 = "btn-danger";
+				else if(optPlayer1.equals("A"))
+					optA1 = "btn-danger";			
+			}
+		}
+		
+		if( timePlayer2 == 25)
+		{
+			if(optCorrect.equals("A"))
+				optA2 = "btn-warning";
+			else if(optCorrect.equals("B"))
+				optB2 = "btn-warning";
+			else if(optCorrect.equals("C"))
+				optC2 = "btn-warning";
+			else if(optCorrect.equals("D"))
+				optD2 = "btn-warning";
+		}
+		
+		else
+		{
+			if(optCorrect.equals("A"))
+			{
+				optA2 = "btn-success";
+				if(optPlayer2.equals("B"))
+					optB2 = "btn-danger";
+				else if(optPlayer2.equals("C"))
+					optC2 = "btn-danger";
+				else if(optPlayer2.equals("D"))
+					optD2 = "btn-danger";			
+			}
+			
+			else if(optCorrect.equals("B"))
+			{
+				optB2 = "btn-success";
+				if(optPlayer2.equals("A"))
+					optA2 = "btn-danger";
+				else if(optPlayer2.equals("C"))
+					optC2 = "btn-danger";
+				else if(optPlayer2.equals("D"))
+					optD2 = "btn-danger";			
+			}
+			
+			else if(optCorrect.equals("C"))
+			{
+				optC2 = "btn-success";
+				if(optPlayer2.equals("B"))
+					optB2 = "btn-danger";
+				else if(optPlayer2.equals("A"))
+					optA2 = "btn-danger";
+				else if(optPlayer2.equals("D"))
+					optD2 = "btn-danger";			
+			}
+			
+			else if(optCorrect.equals("D"))
+			{
+				optD2 = "btn-success";
+				if(optPlayer2.equals("B"))
+					optB2 = "btn-danger";
+				else if(optPlayer2.equals("C"))
+					optC2 = "btn-danger";
+				else if(optPlayer2.equals("A"))
+					optA2 = "btn-danger";			
+			}
+		}
+		
+		
+		// PLAYER 1 (left side)
+		out.write("<li>");
+		out.write("<div class=\"timeline-badge\">");
+		out.write("<a><i class=\"fa fa-circle invert\" id=\"\"></i></a>");
+		out.write("</div>");
+		out.write(" <div class=\"timeline-panel\">");
+		out.write("<div class=\"timeline-heading\">");
+		out.write("<h4><i class=\"fa fa-question-circle\" aria-hidden=\"true\"></i> &nbsp;&nbsp; Question " + questionIndex + "</h4>");
+		out.write("</div>");
+		out.write("<div class=\"timeline-body\">");	
+		out.write("<div class=\"container\">");
+		out.write("<div class=\"row\">");
+		out.write("<div class=\"col-sm-1\"></div>");
+		out.write("<div class=\"col-sm-7 well well-sm\" style=\"white-space: normal; font-size: 13px\">");
+		out.write(strQuestion);					
+		out.write("</div>");		
+		out.write("<div class=\"col-sm-1\"></div>");
+		out.write("</div>");
+		out.write("<div class=\"row\">");
+		out.write("<div class=\"col-sm-2\"></div>");
+		out.write("<div class=\"col-sm-5\">");
+		out.write("<a href=\"javascript:;\" id=\"optA\" class=\"btn " + optA1 + " btn-xs btn-block\" style=\"white-space: normal;\">" +  optA  + "</a>");
+		out.write("<a href=\"javascript:;\" id=\"optB\" class=\"btn " + optB1 + " btn-xs btn-block\" style=\"white-space: normal;\">" +  optB  + "</a>");
+		out.write("<a href=\"javascript:;\" id=\"optC\" class=\"btn " + optC1 + " btn-xs btn-block\" style=\"white-space: normal;\">" +  optC  + "</a>");
+		out.write("<a href=\"javascript:;\" id=\"optD\" class=\"btn " + optD1 + " btn-xs btn-block\" style=\"white-space: normal;\">" +  optD  + "</a>");
+		out.write("</div>");
+		out.write("<div class=\"col-sm-2\"></div>");
+		out.write("</div>");
+		out.write("<div class=\"row\"><br></div>");
+		out.write("</div>");
+		out.write("</div>");	
+		out.write("<div class=\"timeline-footer\">");
+		out.write("<p class=\"alignleft\">" + resultPlayer1 + "</p>");
+		if(timePlayer1 != 25)
+			out.write("<p class=\"text-right\">Solved in " + timePlayer1 + " seconds.</p>");	////////////
+		out.write("<div style=\"clear: both;\"></div>");
+		out.write("</div>");
+		out.write("</div>");
+		out.write("</li>");	
 				
-// 		// PLAYER 2 (right side)
-// 		out.write("<li class=\"timeline-inverted\">");
-// 		out.write("<div class=\"timeline-badge\">");
-// 		out.write("<a><i class=\"fa fa-circle invert\" id=\"\"></i></a>");
-// 		out.write("</div>");
-// 		out.write(" <div class=\"timeline-panel\">");
-// 		out.write("<div class=\"timeline-heading\">");
-// 		out.write("Question " + questionCount);
-// 		out.write("</div>");
-// 		out.write("<div class=\"timeline-body\">");
-// 		out.write("Question " + questionCount);					////////////
-// 		out.write("</div>");
-// 		out.write("<div class=\"timeline-footer\">");
-// 		out.write("<p class=\"text-right\">Feb-21-2014</p>");	////////////
-// 		out.write("</div>");
-// 		out.write("</div>");
-// 		out.write("</li>");	
-// 	}
+		// PLAYER 2 (right side)
+		out.write("<li class=\"timeline-inverted\">");
+		out.write("<div class=\"timeline-badge\">");
+		out.write("<a><i class=\"fa fa-circle invert\" id=\"\"></i></a>");
+		out.write("</div>");
+		out.write(" <div class=\"timeline-panel\">");
+		out.write("<div class=\"timeline-heading\">");
+		out.write("<h4><i class=\"fa fa-question-circle\" aria-hidden=\"true\"></i> &nbsp;&nbsp; Question " + questionIndex + "</h4>");
+		out.write("</div>");
+		out.write("<div class=\"timeline-body\">");	
+		out.write("<div class=\"container\">");
+		out.write("<div class=\"row\">");
+		out.write("<div class=\"col-sm-1\"></div>");
+		out.write("<div class=\"col-sm-7 well well-sm\" style=\"white-space: normal; font-size: 13px\">");
+		out.write(strQuestion);					
+		out.write("</div>");		
+		out.write("<div class=\"col-sm-1\"></div>");
+		out.write("</div>");
+		out.write("<div class=\"row\">");
+		out.write("<div class=\"col-sm-2\"></div>");
+		out.write("<div class=\"col-sm-5\">");
+		out.write("<a href=\"javascript:;\" id=\"optA\" class=\"btn " + optA2 + " btn-xs btn-block\" style=\"white-space: normal;\">" +  optA  + "</a>");
+		out.write("<a href=\"javascript:;\" id=\"optB\" class=\"btn " + optB2 + " btn-xs btn-block\" style=\"white-space: normal;\">" +  optB  + "</a>");
+		out.write("<a href=\"javascript:;\" id=\"optC\" class=\"btn " + optC2 + " btn-xs btn-block\" style=\"white-space: normal;\">" +  optC  + "</a>");
+		out.write("<a href=\"javascript:;\" id=\"optD\" class=\"btn " + optD2 + " btn-xs btn-block\" style=\"white-space: normal;\">" +  optD  + "</a>");
+		out.write("</div>");
+		out.write("<div class=\"col-sm-2\"></div>");
+		out.write("</div>");
+		out.write("<div class=\"row\"><br></div>");
+		out.write("</div>");
+		out.write("</div>");	
+		out.write("<div class=\"timeline-footer\">");
+		out.write("<p class=\"alignleft\">" + resultPlayer2 + "</p>");
+		if(timePlayer2 != 25)
+			out.write("<p class=\"text-right\">Solved in " + timePlayer2 + " seconds.</p>");	////////////
+		out.write("<div style=\"clear: both;\"></div>");
+		out.write("</div>");
+		out.write("</div>");
+		out.write("</li>");	
+	}
 	%>
-
-
-
-
-
-
-
-
-    <li>
-        <div class="timeline-badge">
-          <a><i class="fa fa-circle" id=""></i></a>
-        </div>
-        <div class="timeline-panel">
-            <div class="timeline-heading">
-                <h4><i class="fa fa-question-circle" aria-hidden="true"></i> &nbsp;&nbsp; Question 1</h4>
-            </div>
-            <div class="timeline-body">
-            
-				 <div class="container">
-					<div class="row">
-					<div class="col-sm-1"></div>
-					<div class="col-sm-7 well well-sm" style="white-space: normal; font-size: 13px" >
-						This is the question
-					</div>
-					<div class="col-sm-1"></div>
-					</div>
-					<div class="row">
-					<div class="col-sm-2"></div>
-					<div class="col-sm-5">
-						<a href="javascript:;" id="optA" class="btn btn-success btn-xs btn-block" style="white-space: normal;"> option A </a>
-						<a href="javascript:;" id="optB" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option B </a>
-						<a href="javascript:;" id="optC" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option C</a>
-						<a href="javascript:;" id="optD" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option D</a>
-					</div>
-					<div class="col-sm-2"></div>
-					</div>
-					<div class="row"><br></div>
-				</div>        
-            </div>
-            <div class="timeline-footer">          	
-                <p class="alignleft">Correct Answer!</p>
-                <p class="text-right">Feb-21-2014</p>
-                <div style="clear: both;"></div>
-            </div>         
-        </div>
-    </li>
-    
-    <li class="timeline-inverted">
-        <div class="timeline-badge">
-            <a><i class="fa fa-circle invert" id=""></i></a>
-        </div>
-        <div class="timeline-panel">
-            <div class="timeline-heading">
-                <h4><i class="fa fa-question-circle" aria-hidden="true"></i> &nbsp;&nbsp; Question 1</h4>
-            </div>
-            <div class="timeline-body">
-            
-                <div class="container">
-					<div class="row">
-					<div class="col-sm-1"></div>
-					<div class="col-sm-7 well well-sm" style="white-space: normal; font-size: 13px" >
-						This is the question
-					</div>
-					<div class="col-sm-1"></div>
-					</div>
-					<div class="row">
-					<div class="col-sm-2"></div>
-					<div class="col-sm-5">
-						<a href="javascript:;" id="optA" class="btn btn-success btn-xs btn-block" style="white-space: normal;"> option A </a>
-						<a href="javascript:;" id="optB" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option B </a>
-						<a href="javascript:;" id="optC" class="btn btn-danger btn-xs btn-block" style="white-space: normal;"> option C</a>
-						<a href="javascript:;" id="optD" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option D</a>
-					</div>
-					<div class="col-sm-2"></div>
-					</div>
-					<div class="row"><br></div>
-				</div>
-				
-            </div>
-            <div class="timeline-footer">          	
-            	<p class="alignleft">Wrong answer!</p>
-                <p class="alignright">Feb-23-2014</p>
-                <div style="clear: both;"></div>
-            </div>
-        </div>
-    </li>
-    
-    <li>
-        <div class="timeline-badge">
-          <a><i class="fa fa-circle" id=""></i></a>
-        </div>
-        <div class="timeline-panel">
-            <div class="timeline-heading">
-                <h4><i class="fa fa-question-circle" aria-hidden="true"></i> &nbsp;&nbsp; Question 2</h4>
-            </div>
-            <div class="timeline-body">
-            
-				 <div class="container">
-					<div class="row">
-					<div class="col-sm-1"></div>
-					<div class="col-sm-7 well well-sm" style="white-space: normal; font-size: 13px" >
-						This is the question
-					</div>
-					<div class="col-sm-1"></div>
-					</div>
-					<div class="row">
-					<div class="col-sm-2"></div>
-					<div class="col-sm-5">
-						<a href="javascript:;" id="optA" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option A </a>
-						<a href="javascript:;" id="optB" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option B </a>
-						<a href="javascript:;" id="optC" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option C</a>
-						<a href="javascript:;" id="optD" class="btn btn-warning btn-xs btn-block" style="white-space: normal;"> option D</a>
-					</div>
-					<div class="col-sm-2"></div>
-					</div>
-					<div class="row"><br></div>
-				</div>        
-            </div>
-            <div class="timeline-footer">          	
-                <p class="alignleft">Out of time!</p>
-                <p class="text-right">Feb-21-2014</p>
-                <div style="clear: both;"></div>
-            </div>         
-        </div>
-    </li>
-    
-    <li class="timeline-inverted">
-                <div class="timeline-badge">
-            <a><i class="fa fa-circle invert" id=""></i></a>
-        </div>
-        <div class="timeline-panel">
-            <div class="timeline-heading">
-                <h4><i class="fa fa-question-circle" aria-hidden="true"></i> &nbsp;&nbsp; Question 2</h4>
-            </div>
-            <div class="timeline-body">
-            
-                <div class="container">
-					<div class="row">
-					<div class="col-sm-1"></div>
-					<div class="col-sm-7 well well-sm" style="white-space: normal; font-size: 13px" >
-						This is the question
-					</div>
-					<div class="col-sm-1"></div>
-					</div>
-					<div class="row">
-					<div class="col-sm-2"></div>
-					<div class="col-sm-5">
-						<a href="javascript:;" id="optA" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option A </a>
-						<a href="javascript:;" id="optB" class="btn btn-danger btn-xs btn-block" style="white-space: normal;"> option B </a>
-						<a href="javascript:;" id="optC" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option C</a>
-						<a href="javascript:;" id="optD" class="btn btn-success btn-xs btn-block" style="white-space: normal;"> option D</a>
-					</div>
-					<div class="col-sm-2"></div>
-					</div>
-					<div class="row"><br></div>
-				</div>
-				
-            </div>
-            <div class="timeline-footer">          	
-            	<p class="alignleft">Wrong answer!</p>
-                <p class="alignright">Feb-23-2014</p>
-                <div style="clear: both;"></div>
-            </div>
-        </div>
-    </li>   
-    
-    <li>
-        <div class="timeline-badge">
-          <a><i class="fa fa-circle" id=""></i></a>
-        </div>
-        <div class="timeline-panel">
-            <div class="timeline-heading">
-                <h4><i class="fa fa-question-circle" aria-hidden="true"></i> &nbsp;&nbsp; Question 3</h4>
-            </div>
-            <div class="timeline-body">
-            
-				 <div class="container">
-					<div class="row">
-					<div class="col-sm-1"></div>
-					<div class="col-sm-7 well well-sm" style="white-space: normal; font-size: 13px" >
-						This is the question
-					</div>
-					<div class="col-sm-1"></div>
-					</div>
-					<div class="row">
-					<div class="col-sm-2"></div>
-					<div class="col-sm-5">
-						<a href="javascript:;" id="optA" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option A </a>
-						<a href="javascript:;" id="optB" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option B </a>
-						<a href="javascript:;" id="optC" class="btn btn-success btn-xs btn-block" style="white-space: normal;"> option C</a>
-						<a href="javascript:;" id="optD" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option D</a>
-					</div>
-					<div class="col-sm-2"></div>
-					</div>
-					<div class="row"><br></div>
-				</div>        
-            </div>
-            <div class="timeline-footer">          	
-                <p class="alignleft">Correct Answer!</p>
-                <p class="text-right">Feb-21-2014</p>
-                <div style="clear: both;"></div>
-            </div>         
-        </div>
-    </li>
-    
-    <li class="timeline-inverted">
-                <div class="timeline-badge">
-            <a><i class="fa fa-circle invert" id=""></i></a>
-        </div>
-        <div class="timeline-panel">
-            <div class="timeline-heading">
-                <h4><i class="fa fa-question-circle" aria-hidden="true"></i> &nbsp;&nbsp; Question 3</h4>
-            </div>
-            <div class="timeline-body">
-            
-                <div class="container">
-					<div class="row">
-					<div class="col-sm-1"></div>
-					<div class="col-sm-7 well well-sm" style="white-space: normal; font-size: 13px" >
-						This is the question
-					</div>
-					<div class="col-sm-1"></div>
-					</div>
-					<div class="row">
-					<div class="col-sm-2"></div>
-					<div class="col-sm-5">
-						<a href="javascript:;" id="optA" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option A </a>
-						<a href="javascript:;" id="optB" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option B </a>
-						<a href="javascript:;" id="optC" class="btn btn-success btn-xs btn-block" style="white-space: normal;"> option C</a>
-						<a href="javascript:;" id="optD" class="btn btn-primary btn-xs btn-block" style="white-space: normal;"> option D</a>
-					</div>
-					<div class="col-sm-2"></div>
-					</div>
-					<div class="row"><br></div>
-				</div>
-				
-            </div>
-            <div class="timeline-footer">          	
-            	<p class="alignleft">Correct answer!</p>
-                <p class="alignright">Feb-23-2014</p>
-                <div style="clear: both;"></div>
-            </div>
-        </div>
-    </li>   
     
     <li class="clearfix no-float"></li>
 </ul>
 
-<!-- <p class="footer">Icons by <a href="http://fortawesome.github.io/Font-Awesome/">FontAwesome 4.1 Icons</a>.<br />
-  Created by <a href="http://jenniferperrin.com">Jennifer Perrin</a>
-</p> -->
 
 
 </body>
